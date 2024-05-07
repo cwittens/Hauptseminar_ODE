@@ -73,9 +73,11 @@ begin
 	    end
 		
 	
-	    plot(sol.t, ((initial_first_integrals[1].-H.(q,p))./abs(initial_first_integrals[1])), lab="Fehler der Energie", title="Erhaltungsgrößen", color=:green)
+	    plot(sol.t, ((initial_first_integrals[1].-H.(q,p))./abs(initial_first_integrals[1])), 
+				lab="Fehler der Energie", title="Erhaltungsgrößen", color=:green)
 		
-	    plot!(sol.t, ((initial_first_integrals[2].-L.(q,p))./abs(initial_first_integrals[2])), lab="Fehler des Drehimpulses")
+	    plot!(sol.t, ((initial_first_integrals[2].-L.(q,p))./abs(initial_first_integrals[2])), 
+					lab="Fehler des Drehimpulses")
 	end
 
 	
@@ -120,12 +122,12 @@ begin
 	prob = DynamicalODEProblem(pdot, qdot, initial_velocity, initial_position, 				tspan)
 
 	# calculate solution with dt to compair it with sol2 and make sure no errors were made
-	#sol1 = solve(prob2, Ruth3(), dt=8)
+	sol1 = solve(prob2, Ruth3(), dt=6)
 
 	# set tstops
 	stops = Vector(0:6:t_end)
 	sol_SF = solve(prob, Ruth3(), tstops=stops)
-	sol_NSF = solve(prob, Tsit5(), tstops=stops, abstol = 10, reltol = 10)
+	sol_NSF = solve(prob, Tsit5(), tstops=stops, abstol = 1e10, reltol = 1e10)
 	
 	# put some noise into the tstops in order to crudely approximate variable fixed stepsize
 	
@@ -138,13 +140,13 @@ begin
 	new_stops = sort(new_stops)
 	
 	sol_SV = solve(prob, Ruth3(), tstops=new_stops)
-	sol_NSV = solve(prob, Tsit5(), tstops=new_stops, abstol = 10, reltol = 10)
+	sol_NSV = solve(prob, Tsit5(), tstops=new_stops, abstol = 1e10, reltol = 1e10)
 	print("")
 end
 
 # ╔═╡ 29f039ea-d9eb-4bd2-9c2b-6785694c16aa
 md"""
-### Um sicher zu stellen, dass diese Herangehensweise gerechtfertig ist und keine unerwarteten Nebenwirkungen hat, schauen wir uns wieder zuerst ein explizites Runge-Kutta Verfahren (`Tsit5`) an.
+### Um sicher zu stellen, dass diese Herangehensweise gerechtfertig ist und keine unerwarteten Nebenwirkungen hat, schauen wir uns wieder zuerst ein explizites Runge-Kutta-Verfahren (`Tsit5`) an.
 """
 
 # ╔═╡ ce7495db-2868-4f2b-be28-d93fc36fa53d
@@ -2125,8 +2127,8 @@ version = "1.4.1+1"
 # ╟─12ebbeeb-c159-4db7-be57-7f2212c1250b
 # ╟─f013a556-1033-441c-82ea-3fae6d3de369
 # ╟─6190365e-4c3c-4523-a994-aae5102fc757
-# ╠═f29b51f1-aa90-4bf9-a836-10657d3b0042
-# ╟─a67599eb-b11e-42d4-bea3-a414d5582ae1
+# ╟─f29b51f1-aa90-4bf9-a836-10657d3b0042
+# ╠═a67599eb-b11e-42d4-bea3-a414d5582ae1
 # ╟─29f039ea-d9eb-4bd2-9c2b-6785694c16aa
 # ╠═ce7495db-2868-4f2b-be28-d93fc36fa53d
 # ╟─e8a95069-c715-4a67-8cbd-5957f83e59ac

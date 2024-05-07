@@ -64,10 +64,16 @@ $$\begin{aligned}
 \mathcal{H}=\frac{1}{2}\left(p_1^2+p_2^2\right)-\frac{1}{\sqrt{q_1^2+q_2^2}}, \quad L=q_1 p_2-p_1 q_2
 \end{aligned}$$
 
-Zudem wissen wir die Bewegungsgleichungen sind:
+Zudem wissen wir die Bewegungsgleichungen sind gegeben durch:
 
 $$\begin{aligned}
 \frac{\mathrm{d} p_i}{\mathrm{d} t}=-\frac{\partial \mathcal{H}}{\partial q_i} \quad, \quad \frac{\mathrm{d} q_i}{\mathrm{d} t}=+\frac{\partial \mathcal{H}}{\partial p_i}
+\end{aligned}$$
+
+Mit den typischen Anfangsbedingungen mit Exzentrizität e:
+
+$$\begin{aligned}
+q_1(0)=1-e, \quad q_2(0)=0, \quad p_1(0)=0, \quad p_2(0)=\sqrt{\frac{1+e}{1-e}}, \quad e \in [0,1).
 \end{aligned}$$
 
 Diese Bewegungsgleichungen können wir nun mit verschiedenen numerischen Verfahren probieren zu lösen.
@@ -82,7 +88,7 @@ html"""
 
 # ╔═╡ 18b0051c-6ffc-4cda-9864-86a7300e51de
 md"""
-### Betrachten wir zuerst ein explizites Runge-Kutta Verfahren (`Tsit5`)
+### Betrachten wir zuerst ein explizites Runge-Kutta-Verfahren (`Tsit5`)
 """
 
 # ╔═╡ 7d3d3e7c-bdf3-472d-9824-c3154227d7bf
@@ -103,11 +109,6 @@ md"""
 # ╔═╡ c7df21c8-fa33-4ab2-aa5f-29ec772b8f69
 md"""
 ### Selbst auf langen Zeitskalen bleiben wir weiterhin auf demselben Orbit.
-"""
-
-# ╔═╡ d3c4c2fe-6728-4b04-8b54-8705b7474bcf
-md"""
-### Schauen wir uns dieselben Zeitskalen auch nochmal mit `Tsit5` an.
 """
 
 # ╔═╡ 072382c5-0a11-4c0c-8b0a-c7bdf4ff3aae
@@ -162,10 +163,7 @@ md"""
 md"""
 ### Numerischer Vergleich
 
-Hier vergleichen wir den Rechenaufwand zur numerischen Lösung des
-Arenstorf-Orbits mit konstanter Schrittweite sowie adaptiver Schrittweite
-unter Verwendung der einfachen Kontrolle aus Abschnitt 2.9 in der
-Vorlesung.
+Hier vergleichen wir den Rechenaufwand der numerischen Lösung mit konstanter Schrittweite mit der Lösung der adaptiven Schrittweite.
 """
 
 # ╔═╡ 53cb9639-3e9d-45b2-8ef5-781c244a541a
@@ -176,13 +174,7 @@ md"""
 # ╔═╡ 27d0751b-539a-4547-8fa2-f78565afe8e2
 space = html"<br><br><br>";
 
-# ╔═╡ 260eb749-911d-4b6d-8101-6704622e7a2d
-space
-
 # ╔═╡ 6d7d68bc-3507-4d60-a63c-b489c8bc1164
-space
-
-# ╔═╡ a2cbf5de-a069-4861-a600-440d2bac1949
 space
 
 # ╔═╡ 87faa1d6-4a30-4905-9ca6-07f115003407
@@ -259,8 +251,8 @@ end
 
 # ╔═╡ 4afc9313-905f-42c2-aace-50707a448ac5
 function compute_error_adaptive(tol)
-	compute_error(adaptive = true, abstol = tol, reltol = tol,
-				  controller = IController())
+	compute_error(adaptive = true, abstol = tol, reltol = tol,)
+				  #controller = IController())
 end
 
 # ╔═╡ 2cbb09dc-7162-44a7-a803-18f9c0a3dd69
@@ -373,27 +365,29 @@ end
 
 # ╔═╡ ebe747af-e3b6-4c9f-befb-3625d7b57563
 begin
-	tspan = (0,30.)
+	tspan = 3 .* (0,2π)
 	prob = DynamicalODEProblem(pdot, qdot, initial_velocity, initial_position, tspan)
 	
-	sol = solve(prob, Ruth3(), dt=1//10)
+	sol = solve(prob, Ruth3(), dt=1//10)	#https://docs.sciml.ai/DiffEqDocs/stable/solvers/dynamical_solve/#Symplectic-Integrators 
 	sol_ROS3 = solve(prob, ROS3())
-	#sol_ERKN4 = solve(prob, ERKN4())
 	sol_Tsit5 = solve(prob, Tsit5())
 
-	tspan_long = (0,90.)
+	tspan_long = 30 .* (0,2π)
 	prob_long = DynamicalODEProblem(pdot, qdot, initial_velocity, initial_position, 			tspan_long)
+
+
+	sol_Tsit5_30 = solve(prob_long, Tsit5())
+	sol_30 = solve(prob_long, Ruth3(), dt=1//10)
+	sol_ROS3_30 = solve(prob_long, ROS3())
+
 	
-	tspan_extra_long = (0,680.)
+	tspan_extra_long = 100 .* (0,2π)
 	prob_extra_long = DynamicalODEProblem(pdot, qdot, initial_velocity, 		    				  initial_position, tspan_extra_long)
 	
-	sol_ROS3_2 = solve(prob_long, ROS3())
-	
-	sol_2 = solve(prob_long, Ruth3(), dt=1//10) #https://docs.sciml.ai/DiffEqDocs/stable/solvers/dynamical_solve/#Symplectic-Integrators
-	sol_3 = solve(prob_extra_long, Ruth3(), dt=1//10)
-	
-	sol_Tsit5_2 = solve(prob_long, Tsit5())
-	sol_Tsit5_3 = solve(prob_extra_long, Tsit5())
+	 
+	sol_100 = solve(prob_extra_long, Ruth3(), dt=1//10)
+	sol_ROS3_100 = solve(prob_extra_long, ROS3())
+	sol_Tsit5_100 = solve(prob_extra_long, Tsit5())
 	
 	print("")
 end
@@ -401,30 +395,30 @@ end
 # ╔═╡ 16823c26-9575-425c-90d0-2e756b86cccf
 analysis_plot(sol_Tsit5, H, L)
 
+# ╔═╡ bf515199-46d4-49e3-a972-8be864fa70a1
+analysis_plot(sol_Tsit5_30, H, L)
+
 # ╔═╡ ad266124-4830-4df1-9ec6-c57f40517c85
 analysis_plot(sol_ROS3, H, L)
 
 # ╔═╡ 82ca9a43-840a-4100-b835-2a7860a3b757
-analysis_plot(sol_ROS3_2, H, L)
+analysis_plot(sol_ROS3_30, H, L)
+
+# ╔═╡ 41b15b93-e416-4ad6-a17d-9e819645d9a8
+analysis_plot(sol_ROS3_100, H, L)
 
 # ╔═╡ e018933c-f1b5-403b-aa11-b8376ee2cc74
 analysis_plot(sol, H, L)
 
 # ╔═╡ cd40e1c2-2279-44c2-8eb4-4e2e4f5675f9
-analysis_plot(sol_2, H, L)
+analysis_plot(sol_30, H, L)
 
 # ╔═╡ ee39a5ad-ebdf-4a88-99f3-684ef64ebceb
-analysis_plot(sol_3, H, L)
-
-# ╔═╡ 4e1f2515-92eb-4326-abcd-23e09c30e37e
-analysis_plot(sol_Tsit5_2, H, L)
-
-# ╔═╡ f088c9f9-7a49-4d99-9548-b605d30396df
-analysis_plot(sol_Tsit5_3, H, L)
+analysis_plot(sol_100, H, L)
 
 # ╔═╡ 5b1c399b-a415-4cf5-89d5-63215f66b2c1
 begin
-	tspan2 = (0,70)
+	tspan2 = 15 .* (0,2π)
 	prob2 = DynamicalODEProblem(pdot, qdot, initial_velocity2, initial_position2, tspan2)
 	ts = Vector(0:0.1:70)
 	sol_err = solve(prob2, Ruth3(), dt=1//10)
@@ -2418,30 +2412,27 @@ version = "1.4.1+1"
 # ╠═c2efbf5c-e53a-46ba-b2a8-33f7a5a1c39f
 # ╠═6addca94-b874-49e7-a1c5-ad9da03206da
 # ╠═513c43b0-d3a6-4f82-8f63-db935ca9289b
-# ╠═86ca52f0-b718-465c-9128-a4a057ed789f
+# ╟─86ca52f0-b718-465c-9128-a4a057ed789f
 # ╟─95e08125-e203-41cb-96b4-03604aa5ab76
 # ╟─614d7b62-7afb-42f8-8947-8bdb0d09faae
 # ╟─4e84ba7b-7569-4aca-b5d0-8827d8fc26c9
 # ╟─ebe747af-e3b6-4c9f-befb-3625d7b57563
 # ╟─18b0051c-6ffc-4cda-9864-86a7300e51de
 # ╠═16823c26-9575-425c-90d0-2e756b86cccf
+# ╠═bf515199-46d4-49e3-a972-8be864fa70a1
 # ╟─7d3d3e7c-bdf3-472d-9824-c3154227d7bf
 # ╠═ad266124-4830-4df1-9ec6-c57f40517c85
 # ╟─3c55ea76-15b4-4854-8ed7-ae163f3e793f
 # ╠═82ca9a43-840a-4100-b835-2a7860a3b757
+# ╠═41b15b93-e416-4ad6-a17d-9e819645d9a8
 # ╟─d928e6a6-1181-44b7-bf39-57a77ab63397
 # ╠═e018933c-f1b5-403b-aa11-b8376ee2cc74
 # ╟─c7df21c8-fa33-4ab2-aa5f-29ec772b8f69
 # ╠═cd40e1c2-2279-44c2-8eb4-4e2e4f5675f9
 # ╠═ee39a5ad-ebdf-4a88-99f3-684ef64ebceb
-# ╟─d3c4c2fe-6728-4b04-8b54-8705b7474bcf
-# ╠═4e1f2515-92eb-4326-abcd-23e09c30e37e
-# ╠═f088c9f9-7a49-4d99-9548-b605d30396df
 # ╟─5b1c399b-a415-4cf5-89d5-63215f66b2c1
-# ╟─260eb749-911d-4b6d-8101-6704622e7a2d
 # ╟─6d7d68bc-3507-4d60-a63c-b489c8bc1164
 # ╟─072382c5-0a11-4c0c-8b0a-c7bdf4ff3aae
-# ╟─a2cbf5de-a069-4861-a600-440d2bac1949
 # ╟─791d9eca-c0b6-4430-bc17-74289d2f8182
 # ╠═ed83d9a6-80a2-479f-912b-d0ea6ac04032
 # ╟─b127bec3-a4db-4666-acfb-c5b70f67efe4
@@ -2472,6 +2463,6 @@ version = "1.4.1+1"
 # ╟─185115b4-a79f-4054-9543-4436b2c24ce2
 # ╟─03039f16-96e1-4fdf-b2c8-4ce6fcce30a2
 # ╟─4afc9313-905f-42c2-aace-50707a448ac5
-# ╟─a69f9531-6ae1-4248-a8fd-a6f0994d7a4a
+# ╠═a69f9531-6ae1-4248-a8fd-a6f0994d7a4a
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
