@@ -29,6 +29,7 @@
 \RequirePackage[sorting=nty,style=nature]{biblatex}
 \RequirePackage{graphicx}
 \RequirePackage{float}
+\RequirePackage{amsmath}
 %\RequirePackage[style=authortitle-dw, backend=bibtex]{biblatex}
 \usepackage[a4paper,bottom=15mm]{geometry} % für Seitenränder, 
 

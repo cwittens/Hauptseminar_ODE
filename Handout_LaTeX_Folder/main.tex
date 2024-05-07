@@ -39,15 +39,15 @@ Eine differenzierbare Abbildung heißt symplektisch, genau dann, wenn ihre Jacob
 
 \subsection{Charakteristische Eigenschaften Hamiltonscher Systeme}
 
-ODE Systeme $u^{\prime}(t)=f(u(t))$ sind genau dann (lokal) Hamiltonsch, wenn der zugehörige Fluss $\psi_t$ der $(p_0,q_0) \mapsto (p(t),q(t))$ abbildet, eine symplektische Abbildung ist. Zudem gilt dann, dass das von $dp\wedge dq$ aufgespannte Phasenraumvolumen erhalten bleibt.
+ODE Systeme $u^{\prime}(t)=f(u(t))$ sind genau dann (lokal) Hamiltonsch, wenn der zugehörige Fluss $\psi_t$ der $(p_0,q_0) \mapsto (p(t),q(t))$ abbildet, eine symplektische Abbildung ist. Zudem gilt dann, dass die differentielle 2-Form $dp\wedge dq$ erhalten bleibt.
 
 \subsection{Symplektisches Verfahren}
-Es kann kein numerisches Einschrittverfahren geben, welches beliebige Hamiltonien $H$ exakt erhält. Man kann jedoch Verfahren $\phi_h$ entwickeln, die $(p^n,q^n) \mapsto (p^{n+1},q^{n+1})$ symplektisch abbilden und damit das Phasenraumvolumen erhalten.
+Es kann kein numerisches Einschrittverfahren geben, welches beliebige Hamiltonien $H$ exakt erhält. Man kann jedoch Verfahren $\phi_h$ entwickeln, die $(p^n,q^n) \mapsto (p^{n+1},q^{n+1})$ symplektisch abbilden und damit die 2-Form $dp\wedge dq$ erhalten.
 
-Diese symlpektischen Verfahren besitzen viele Vorteile gegenüber klassischen Runge-Kutta-Verfahren, insbesondere wenn man über große Zeitskalen integriert. \cite{stackexchange} \cite{LectureODE}
+Symplektischen Verfahren besitzen viele Vorteile gegenüber klassischen Runge-Kutta-Verfahren, insbesondere wenn man über große Zeitskalen integriert. \cite{stackexchange} \cite{LectureODE}
 
 \section{Numerisches Beispiele}
-Der Vorteil von symplektischen Verfahren wird schnell ersichtlich, wenn man folgendes Hamiltonsche Systeme $\mathcal{H}=\frac{1}{2}\left(p_1^2+p_2^2\right)-\frac{1}{\sqrt{q_1^2+q_2^2}}$, welches den elliptischen Orbit eines Planeten um die Sonne modelliert, über große Zeitskalen integriert.
+Diese Vorteile von symplektischen Verfahren werden schnell ersichtlich, wenn man folgendes Hamiltonsche System $\mathcal{H}=\frac{1}{2}\left(p_1^2+p_2^2\right)-\frac{1}{\sqrt{q_1^2+q_2^2}}$, welches den elliptischen Orbit eines Planeten um die Sonne modelliert, auf großen Zeitskalen betrachtet.
 
 \begin{figure}[H]
     \centering
@@ -63,16 +63,40 @@ Der Vorteil von symplektischen Verfahren wird schnell ersichtlich, wenn man folg
     \label{fig:symp}
 \end{figure}
 
-Während der Orbit des Planeten beim explizite Verfahren langsam aber sicher der Sonne immer näher kommt und es zudem einen linearen Drift in der Gesamtenergie des Systems gibt, bleibt das symplektische Verfahren, wie wir es aus unserer Alltagserfahrung kennen, auf der Umlaufbahn und die Gesamtenergie bleibt zwar nicht exakt erhalten, ihr Fehler ist aber periodisch. 
+Während der Orbit des Planeten beim expliziten Verfahren langsam aber sicher der Sonne immer näher kommt und es zudem einen linearen Drift in der Gesamtenergie des Systems gibt, bleibt die Lösung des symplektische Verfahren auf der Umlaufbahn und die Gesamtenergie bleibt zwar nicht exakt erhalten, ihr Fehler ist aber periodisch. 
 
 \section{Symplektische Verfahren und Schrittweitenkontrolle}
-Ein wesentliches Element von klassischen Runge-Kutta-Verfahren ist die Schrittweitenkontrolle. Mithilfe dieser können wir sicherstellen, dass unsere numerische Lösung im Rahmen unserer vorgebenden Toleranz genau ist und zudem effizient berechnet wird.
+Ein wesentlicher Bestandteil von klassischen Runge-Kutta-Verfahren ist die Schrittweitenkontrolle. Mithilfe dieser können wir sicherstellen, dass unsere numerische Lösung im Rahmen unserer vorgebenden Toleranz genau ist und zudem effizient berechnet wird.
 
-Es gilt jedoch, dass eine Einschrittverfahren $\phi_{h_n}$ mit variabler Schrittweite $h_n = h\cdot \Theta(p^n,q^n;h)$ nur dann symplektisch sein können, wenn gilt $\Theta(p^n,q^n;h) = \Theta(p^0,q^0;h) + \mathcal{O}(h^2)$. Also anders gesagt, die Schrittweite $h_n$ asymptotisch konstant ist. 
+Es gilt jedoch, dass eine Einschrittverfahren $\phi_{h_n}$ mit variabler Schrittweite $h_n = h\cdot \Theta(p^n,q^n;h)$ nur dann symplektisch sein können, wenn gilt $\Theta(p^n,q^n;h) = \Theta(p^0,q^0;h) + \mathcal{O}(h^2)$. Also anders gesagt, die Schrittweite $h_n$ asymptotisch konstant ist. Also ist es nicht möglich bei einem symplektischen Verfahren die Zeitschrittweite adaptive zu variieren.  
 
 Den Beweis dazu findet man im Paper \textit{Does variable step size ruin a symplectic integrator?} von R.D. Skeel und C.W. Gear \cite{SKEEL1992311}.
 
+\section{Ausblick}
+Eine alternative Lösung für dieses Problem besteht darin, unser Verfahren nicht adaptiv zu gestalten, sondern stattdessen unser Hamiltonsches System zu transformieren $H(p, q) \mapsto K(p, q, \varepsilon)$. Das Lösen des neuen Systems $K$ mit konstanter Schrittweite, sollte dann dem lösen des ursprünglichen Systems $H$ mit variabler Schrittweite entsprechen. 
 
+Eine solche mögliche Transformation ist gegeben durch
+\begin{equation}
+    K(p, q, \varepsilon)=s(p, q, \varepsilon)\left(H(p, q)-H_0\right)
+\end{equation}
+wobei gilt $H_0 = H(p^0, q^0)$ und $s(p, q, \varepsilon) > 0 $ eine zustandsabhängige Funktion ist.
+
+Die neuen Bewegungsgleichungen sind dann gegeben durch
+\begin{equation}
+\begin{split}
+     p^{\prime}=-s(p, q, \varepsilon) H_q(p, q)-s_q(p, q, \varepsilon)\left(H(p, q)-H_0\right) \\
+     q^{\prime}=s(p, q, \varepsilon) H_p(p, q)+s_p(p, q, \varepsilon)\left(H(p, q)-H_0\right).
+\end{split}
+\end{equation}
+
+Die Lösung des neuen Hamiltonians $K(p, q, \varepsilon)$  $(P(t),Q(t))$ hängt dann mit der Lösung $(p(t),q(t))$ des ursprünglichen Hamiltonians $H(p, q)$ folgendermaßen zusammen
+\begin{equation}
+\begin{split}
+    P(t)=p(\alpha(t, \varepsilon)), \quad Q(t)=q(\alpha(t, \varepsilon)) \\
+    \text{wobei} \quad \alpha(t, \varepsilon)=\int_0^t s(P(\tau), Q(\tau), \varepsilon) \mathrm{d} \tau .
+\end{split}
+\end{equation}
+Weitere Informationen und mögliche Probleme dieses Ansatz sind zu finden in dem Paper \textit{Variable time step integration with symplectic methods} von Ernst Hairer \cite{HAIRER1997219}.
 
 \section*{Git-Repository}
 Dieses Handout, sowie die in meinem Vortrag verwendeten Pluto Notebooks sind in folgendem Git-Repository zu finden: \href{https://github.com/cwittens/Hauptseminar_ODE}{https://github.com/cwittens/Hauptseminar\_ODE}.
